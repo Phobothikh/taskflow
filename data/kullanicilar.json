@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1",
+    "eposta": "admin@taskflow.com",
+    "sifreHash": "$2b$10$uQKSeT/5n1H7KIBJJ4Yre.nKlrdJjFuio8k2S2tpBGGzum1XEw0Ni",
+    "gorunenAd": "Admin",
+    "rol": "admin",
+    "ilkGiris": false
+  },
+  {
+    "id": "2",
+    "eposta": "uye@taskflow.com",
+    "sifreHash": "$2b$10$eFSYzHpDwX9tne.cNc94zu/ieoX/L1VgDvHwYOLeJIJjAjeTTsB3K",
+    "gorunenAd": "Demo Üye",
+    "rol": "uye",
+    "ilkGiris": true
+  }
+]

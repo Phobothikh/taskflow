@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="tr" data-tema="koyu">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0c1118" />
+    <title>TASKFLOW</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/stil.css?v=30" />
+  </head>
+  <body>
+    <div class="arkaplan"></div>
+
+    <!-- Giriş ekranı (oturum yokken) -->
+    <section class="giris-ekrani" id="girisEkrani">
+      <div class="giris-kart">
+        <div class="marka marka-buyuk">
+          <span class="marka-ikon">TF</span>
+          <span class="marka-yazi">TASKFLOW<span class="nokta">.</span></span>
+        </div>
+        <p class="giris-aciklama">Kurumsal görev yönetim paneli</p>
+        <form id="girisForm" class="giris-form">
+          <label>
+            E-posta
+            <input
+              type="text"
+              name="eposta"
+              id="girisEposta"
+              required
+              autocomplete="username"
+              inputmode="email"
+              placeholder="uye@taskflow.com"
+            />
+          </label>
+          <label>
+            Şifre
+            <input
+              type="password"
+              name="sifre"
+              id="girisSifre"
+              required
+              autocomplete="current-password"
+              placeholder="••••••••"
+            />
+          </label>
+          <p class="giris-hata" id="girisHata" hidden></p>
+          <button type="submit" class="dugme birincil tam-genislik" id="girisDugme">Giriş yap</button>
+        </form>
+
+        <div class="demo-kutu">
+          <p class="demo-baslik">Test hesabı (eğitim ortamı)</p>
+          <p>uye@taskflow.com · şifre: 123456</p>
+          <button type="button" class="dugme ikincil tam-genislik" id="demoUyeGiris">
+            Bilgileri forma yaz
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Uygulama (girişten sonra) -->
+    <div class="uygulama-kabuk" id="uygulamaKabuk" hidden>
+      <aside class="yan-menu" id="yanMenu" aria-hidden="true">
+        <div class="yan-menu-ust">
+          <div class="marka marka-menu">
+            <span class="marka-ikon">TF</span>
+            <span class="marka-yazi">TASKFLOW<span class="nokta">.</span></span>
+          </div>
+          <button type="button" class="menu-kapat" id="menuKapat" aria-label="Menüyü kapat">✕</button>
+        </div>
+
+        <div class="yan-menu-kaydir">
+          <p class="menu-baslik">Ana menü</p>
+          <nav class="menu-liste" id="anaMenu">
+            <button type="button" class="menu-oge aktif" data-sayfa="genel-bakis">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">▦</span>
+              Genel bakış
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="gorevler">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">☑</span>
+              Görevlerim
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="projeler">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">P</span>
+              Projeler
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="ekip">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">E</span>
+              Ekip
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="bildirimler">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">B</span>
+              Bildirimler
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="duyurular">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">D</span>
+              Duyurular
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="notlar">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">N</span>
+              Notlar
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="dokumanlar">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">F</span>
+              Dökümanlar
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="raporlar">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">R</span>
+              Günlük rapor
+              <span class="menu-rozet" id="raporMenuRozet" hidden aria-label="Rapor bekleniyor"></span>
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="takvim">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">T</span>
+              Takvim
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="flybird">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">✈</span>
+              Fly Bird
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="hafiza">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">H</span>
+              Hafıza
+            </button>
+            <button type="button" class="menu-oge" data-sayfa="profilim">
+              <span class="menu-cizgi" aria-hidden="true"></span>
+              <span class="menu-ikon" aria-hidden="true">○</span>
+              Profilim
+            </button>
+          </nav>
+        </div>
+
+        <div class="yan-menu-alt">
+          <section class="hafta-favori" id="haftaFavori" aria-label="Bu haftanın favorileri">
+            <p class="menu-baslik">Bu hafta</p>
+            <div class="hafta-favori-kart" id="haftaFavoriKart">
+              <p class="hafta-durum">Yükleniyor…</p>
+            </div>
+            <details class="hafta-ekle">
+              <summary>Bugünkü öğünü ekle</summary>
+              <form id="haftaFavoriForm">
+                <label>
+                  Yemek
+                  <input type="text" name="yemek" maxlength="40" autocomplete="off" placeholder="Örn. mercimek" />
+                </label>
+                <label>
+                  İçecek
+                  <input type="text" name="icecek" maxlength="40" autocomplete="off" placeholder="Örn. çay" />
+                </label>
+                <p class="hafta-form-hata" id="haftaFormHata" hidden></p>
+                <button type="submit" class="hafta-kaydet">Kaydet</button>
+              </form>
+            </details>
+          </section>
+          <div class="profil">
+            <span class="profil-harf" id="profilHarf">?</span>
+            <div class="profil-metin">
+              <p class="profil-ad" id="profilAd">—</p>
+              <p class="profil-rol" id="profilRol">Üye</p>
+            </div>
+            <button type="button" class="ikon-dugme kucuk" id="temaDegistir" title="Tema">☀</button>
+            <button type="button" class="ikon-dugme kucuk cikis" id="cikisYap" title="Çıkış yap" aria-label="Çıkış">↪</button>
+          </div>
+        </div>
+      </aside>
+      <div class="menu-perde" id="menuPerde"></div>
+
+      <div class="ana-sutun">
+        <header class="ust-cubuk mobil-ust">
+          <button type="button" class="nav-tetik" id="menuAc" aria-label="Menüyü aç">
+            <span class="ikon-cizgi"></span>
+            <span class="ikon-cizgi"></span>
+            <span class="ikon-cizgi"></span>
+          </button>
+          <h1 class="ust-baslik" id="ustSayfaBaslik">Genel bakış</h1>
+          <button type="button" class="nav-profil" id="ustProfil" aria-label="Profilim">
+            <span id="ustProfilHarf">?</span>
+          </button>
+        </header>
+
+        <header class="masaustu-ust">
+          <h1 class="masaustu-baslik" id="masaustuSayfaBaslik">Genel bakış</h1>
+          <div class="masaustu-ust-sag">
+            <label class="arama-kutu">
+              <span class="arama-ikon" aria-hidden="true">⌕</span>
+              <input type="search" placeholder="Ara..." autocomplete="off" aria-label="Ara" />
+            </label>
+            <button type="button" class="ikon-dugme masaustu-zil" id="bildirimZil" title="Bildirimler" aria-label="Bildirimler">
+              🔔
+              <span class="zil-nokta" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="dugme birincil masaustu-tarih" id="masaustuTarih">
+              📅 <span id="masaustuTarihMetin">Bugün</span>
+            </button>
+          </div>
+        </header>
+
+        <main class="icerik">
+        <!-- Genel bakış -->
+        <div class="sayfa aktif" data-sayfa="genel-bakis">
+          <div id="gunlukRaporHatirlat" class="gunluk-rapor-hatirlat" hidden></div>
+          <section class="karsilama karsilama-kutu karsilama-kahraman">
+            <div class="karsilama-metin">
+              <h1>Hoş geldin, <span id="kullaniciAdi">...</span>!</h1>
+              <p class="alt-baslik">İşte bugünkü proje ve görev özetin</p>
+            </div>
+            <div class="karsilama-gorsel" aria-hidden="true">
+              <span class="kahraman-dekor">✦</span>
+              <span class="kahraman-pano">📋</span>
+            </div>
+          </section>
+          <section class="ozet-grid">
+            <article class="ozet-kart">
+              <div class="ozet-ikon mavi">T</div>
+              <div>
+                <p class="ozet-sayi" id="sayiToplam">0</p>
+                <p class="ozet-etiket">Toplam görev</p>
+              </div>
+            </article>
+            <article class="ozet-kart">
+              <div class="ozet-ikon yesil">✓</div>
+              <div>
+                <p class="ozet-sayi" id="sayiTamamlanma">0%</p>
+                <p class="ozet-etiket">Tamamlanma</p>
+              </div>
+            </article>
+            <article class="ozet-kart">
+              <div class="ozet-ikon sari">D</div>
+              <div>
+                <p class="ozet-sayi" id="sayiDevam">0</p>
+                <p class="ozet-etiket">Devam eden</p>
+              </div>
+            </article>
+            <article class="ozet-kart">
+              <div class="ozet-ikon kirmizi">!</div>
+              <div>
+                <p class="ozet-sayi" id="sayiAcil">0</p>
+                <p class="ozet-etiket">Acil görev</p>
+              </div>
+            </article>
+          </section>
+          <div class="panel-cift">
+            <section class="panel">
+              <div class="panel-baslik">
+                <h2>Görevlerim</h2>
+                <div class="panel-baslik-sag">
+                  <button type="button" class="baglanti" data-git="gorevler">Tümünü gör</button>
+                  <button type="button" class="dugme birincil masaustu-gorev-ekle" id="masaustuYeniGorev">
+                    + Yeni Görev Ekle
+                  </button>
+                </div>
+              </div>
+              <div class="panel-govde" id="gorevListesiOzet">
+                <p class="yukleniyor">Görevler yükleniyor…</p>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="panel-baslik">
+                <h2>Son projeler</h2>
+                <button type="button" class="baglanti" data-git="projeler">Tümünü gör</button>
+              </div>
+              <div class="panel-govde bos-durum">
+                <div class="bos-ikon bos-harf">P</div>
+                <p>Henüz proje yok</p>
+                <button type="button" class="dugme ikincil masaustu-proje-ekle" data-git="projeler">
+                  Proje Oluştur
+                </button>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- Tüm görevler -->
+        <div class="sayfa" data-sayfa="gorevler" hidden>
+          <section class="sayfa-baslik">
+            <button type="button" class="baglanti geri" data-git="genel-bakis">← Geri</button>
+            <h1>Görevlerim</h1>
+          </section>
+          <div class="panel">
+            <div class="panel-govde" id="gorevListesiTam"></div>
+          </div>
+        </div>
+
+        <!-- Diğer menü sayfaları -->
+        <div class="sayfa" data-sayfa="projeler" hidden>
+          <section class="sayfa-baslik">
+            <h1>Projeler</h1>
+            <p class="alt-baslik">Eğitim ortamındaki proje kayıtları</p>
+          </section>
+          <div class="panel"><div class="panel-govde sayfa-icerik" id="projelerIcerik"></div></div>
+        </div>
+        <div class="sayfa" data-sayfa="ekip" hidden>
+          <section class="sayfa-baslik">
+            <h1>Ekip</h1>
+            <p class="alt-baslik">TASKFLOW kullanıcıları ve roller</p>
+          </section>
+          <div class="panel"><div class="panel-govde sayfa-icerik" id="ekipIcerik"></div></div>
+        </div>
+        <div class="sayfa" data-sayfa="bildirimler" hidden>
+          <section class="sayfa-baslik">
+            <h1>Bildirimler</h1>
+            <p class="alt-baslik">Son aktiviteler</p>
+          </section>
+          <div class="panel"><div class="panel-govde sayfa-icerik" id="bildirimIcerik"></div></div>
+        </div>
+        <div class="sayfa" data-sayfa="duyurular" hidden>
+          <section class="sayfa-baslik">
+            <h1>Duyurular</h1>
+            <p class="alt-baslik">Kurum içi haberler</p>
+          </section>
+          <div class="panel"><div class="panel-govde sayfa-icerik" id="duyuruIcerik"></div></div>
+        </div>
+        <div class="sayfa" data-sayfa="notlar" hidden>
+          <section class="sayfa-baslik">
+            <h1>Notlar</h1>
+            <p class="alt-baslik">Kişisel hızlı notlar (tarayıcıda saklanır)</p>
+          </section>
+          <div class="panel"><div class="panel-govde sayfa-icerik" id="notlarIcerik"></div></div>
+        </div>
+        <div class="sayfa" data-sayfa="dokumanlar" hidden>
+          <section class="sayfa-baslik">
+            <h1>Dökümanlar</h1>
+            <p class="alt-baslik">Proje dosyaları</p>
+          </section>
+          <div class="panel"><div class="panel-govde sayfa-icerik" id="dokumanIcerik"></div></div>
+        </div>
+        <div class="sayfa" data-sayfa="raporlar" hidden>
+          <section class="sayfa-baslik">
+            <h1>Günlük rapor</h1>
+            <p class="alt-baslik">Her gün kısa özet — yapılanlar ve plan</p>
+          </section>
+          <div class="sayfa-icerik" id="raporIcerik"></div>
+        </div>
+        <div class="sayfa" data-sayfa="takvim" hidden>
+          <section class="sayfa-baslik">
+            <h1>Takvim</h1>
+            <p class="alt-baslik">Bu ay</p>
+          </section>
+          <div class="panel"><div class="panel-govde sayfa-icerik" id="takvimIcerik"></div></div>
+        </div>
+        <div class="sayfa" data-sayfa="flybird" hidden>
+          <section class="sayfa-baslik">
+            <h1>Fly Bird</h1>
+            <p class="alt-baslik">Boruların arasından geç, ekip sıralamasına gir</p>
+          </section>
+          <div class="panel flybird-panel">
+            <div class="panel-govde">
+              <div class="flybird-duzen">
+                <div class="flybird-sahne">
+                  <canvas id="flybirdTuval" width="360" height="520" aria-label="Fly Bird oyun alanı"></canvas>
+                  <div class="flybird-ortu" id="flybirdOrtu">
+                    <p id="flybirdOrtuMetin">Zıplamak için tıkla veya boşluk tuşuna bas.</p>
+                    <button type="button" class="dugme birincil" id="flybirdBasla">Başla</button>
+                  </div>
+                </div>
+                <aside class="flybird-sira" aria-label="Ekip sıralaması">
+                  <p class="menu-baslik">Ekip sıralaması</p>
+                  <ol class="flybird-sira-liste" id="flybirdSira"></ol>
+                </aside>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sayfa" data-sayfa="hafiza" hidden>
+          <section class="sayfa-baslik">
+            <h1>Hafıza</h1>
+            <p class="alt-baslik">8 çift kart — kısa bir mola oyunu</p>
+          </section>
+          <div class="panel hafiza-panel">
+            <div class="panel-govde">
+              <div class="hafiza-ust">
+                <p class="hafiza-skor" id="hafizaSkor">Hamle 0</p>
+                <button type="button" class="baglanti" id="hafizaYenile">Yeniden başla</button>
+              </div>
+              <p class="hafiza-mesaj" id="hafizaMesaj"></p>
+              <div class="hafiza-tahta" id="hafizaTahta" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+        <div class="sayfa" data-sayfa="profilim" hidden>
+          <section class="sayfa-baslik">
+            <h1>Profilim</h1>
+            <p class="alt-baslik">Hesap bilgileri ve oturum</p>
+          </section>
+          <div class="sayfa-icerik profil-sayfa-wrap" id="profilIcerik">
+            <p class="yukleniyor">Profil yükleniyor…</p>
+          </div>
+        </div>
+        </main>
+      </div>
+
+      <button type="button" class="fab" id="yeniGorevFab" title="Yeni görev ekle" hidden aria-label="Yeni görev">
+        +
+      </button>
+
+      <dialog class="modal" id="gorevModal">
+        <form id="gorevForm">
+          <h3>Yeni görev</h3>
+          <label>
+            Başlık
+            <input type="text" name="baslik" required placeholder="Ne yapılacak?" />
+          </label>
+          <label>
+            Açıklama
+            <textarea name="aciklama" rows="3" placeholder="İsteğe bağlı"></textarea>
+          </label>
+          <label>
+            Öncelik
+            <select name="oncelik">
+              <option value="dusuk">Düşük</option>
+              <option value="orta" selected>Orta</option>
+              <option value="yuksek">Yüksek</option>
+              <option value="acil">Acil</option>
+            </select>
+          </label>
+          <label>
+            Durum
+            <select name="durum">
+              <option value="beklemede">Beklemede</option>
+              <option value="devam_ediyor">Devam ediyor</option>
+              <option value="tamamlandi">Tamamlandı</option>
+            </select>
+          </label>
+          <div class="modal-dugmeler">
+            <button type="button" class="dugme ikincil" id="modalIptal">Vazgeç</button>
+            <button type="submit" class="dugme birincil">Kaydet</button>
+          </div>
+        </form>
+      </dialog>
+    </div>
+
+    <script src="/js/sayfalar.js?v=4"></script>
+    <script src="/js/hafiza.js?v=1"></script>
+    <script src="/js/flybird.js?v=2"></script>
+    <script src="/js/uygulama.js?v=19"></script>
+  </body>
+</html>

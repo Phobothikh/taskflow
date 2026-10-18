@@ -1,0 +1,4 @@
+node_modules/
+gunluk/*.log
+logs/*.log
+.env

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "gorev-admin-teslim",
+    "baslik": "Teslim öncesi kontrol",
+    "aciklama": "Admin panelinden eklendi. Sol menü, bildirimler ve görev listesini kontrol et.",
+    "oncelik": "yuksek",
+    "durum": "beklemede",
+    "atanan": "uye@taskflow.com",
+    "olusturulma": "2026-10-18T20:25:00.000Z",
+    "guncellenme": "2026-10-18T20:25:00.000Z"
+  }
+]

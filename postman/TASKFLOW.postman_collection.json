@@ -1,0 +1,501 @@
+{
+  "info": {
+    "_postman_id": "taskflow-collection-2026",
+    "name": "TASKFLOW API",
+    "description": "Eğitim projesi — oturum, görev CRUD, günlük rapor.\n\n**Kurulum**\n1. Ortam: `TASKFLOW Yerel`\n2. Sunucu: `npm run dev` → `http://localhost:3000`\n3. Detaylı adımlar: repo içi `docs/POSTMAN.md`\n\n**Hızlı CRUD (5 ekran görüntüsü)**\nGiriş yap → GET liste → POST → GET tek → PUT → DELETE\n\n**Günlük rapor**\nÜye: Giriş yap → GET bugün → POST rapor\nAdmin: Giriş yap (admin) → GET takip → POST hatırlat",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0 — Sağlık",
+      "description": "Sunucu ayakta mı kontrolü (oturum gerekmez).",
+      "item": [
+        {
+          "name": "Durum kontrol",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('API cevap veriyor', () => pm.expect(json.basarili).to.eql(true));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{temel_url}}/durum",
+            "description": "`GET /durum` — Postman veya tarayıcıdan ilk test."
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 — Oturum",
+      "description": "Giriş sonrası `oturum_anahtari` ortam değişkenine yazılır. Günlük rapor uçları `X-Oturum-Anahtari` ister.",
+      "item": [
+        {
+          "name": "Giriş yap (üye)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Giriş başarılı', () => pm.expect(json.basarili).to.eql(true));",
+                  "pm.test('Oturum anahtarı geldi', () => pm.expect(json.oturumAnahtari).to.be.a('string').and.not.empty);",
+                  "if (json.oturumAnahtari) {",
+                  "  pm.environment.set('oturum_anahtari', json.oturumAnahtari);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eposta\": \"{{eposta}}\",\n  \"sifre\": \"{{sifre}}\"\n}"
+            },
+            "url": "{{temel_url}}/giris",
+            "description": "Varsayılan: `uye@taskflow.com` / `123456`"
+          }
+        },
+        {
+          "name": "Giriş yap (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Admin girişi başarılı', () => pm.expect(json.basarili).to.eql(true));",
+                  "if (json.oturumAnahtari) {",
+                  "  pm.environment.set('oturum_anahtari', json.oturumAnahtari);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eposta\": \"{{admin_eposta}}\",\n  \"sifre\": \"{{admin_sifre}}\"\n}"
+            },
+            "url": "{{temel_url}}/giris",
+            "description": "Admin uçları (`/gunluk-raporlar/takip`) için önce bunu çalıştır."
+          }
+        },
+        {
+          "name": "Ben (oturum)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Kullanıcı bilgisi', () => pm.expect(json.kullanici).to.be.an('object'));",
+                  "if (json.kullanici && json.kullanici.id) {",
+                  "  pm.environment.set('kullanici_id', json.kullanici.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }],
+            "url": "{{temel_url}}/ben",
+            "description": "Oturumlu kullanıcı; `kullanici_id` ortama yazılır."
+          }
+        },
+        {
+          "name": "Çıkış yap",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oturumAnahtari\": \"{{oturum_anahtari}}\"\n}"
+            },
+            "url": "{{temel_url}}/cikis"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 — Görevler (CRUD)",
+      "description": "Yönerge için 5 ekran görüntüsü: GET liste, POST, GET id, PUT, DELETE. Önce **Giriş yap (üye)** gerekmez; görevler herkese açık.",
+      "item": [
+        {
+          "name": "GET — Tüm görevler",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Liste başarılı', () => pm.expect(json.basarili).to.eql(true));",
+                  "pm.test('gorevler dizisi', () => pm.expect(json.gorevler).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{temel_url}}/gorevler",
+            "description": "CREATE öncesi mevcut görevleri göster — **ekran görüntüsü 1/5**"
+          }
+        },
+        {
+          "name": "POST — Yeni görev",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('Oluşturuldu', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));",
+                  "pm.test('basarili', () => pm.expect(json.basarili).to.eql(true));",
+                  "if (json.gorev && json.gorev.id) {",
+                  "  pm.environment.set('gorev_id', json.gorev.id);",
+                  "  pm.test('gorev_id kaydedildi', () => pm.expect(pm.environment.get('gorev_id')).to.eql(json.gorev.id));",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baslik\": \"Postman test görevi\",\n  \"aciklama\": \"CRUD ekran görüntüsü için\",\n  \"oncelik\": \"orta\",\n  \"durum\": \"beklemede\",\n  \"atanan\": \"uye@taskflow.com\"\n}"
+            },
+            "url": "{{temel_url}}/gorevler",
+            "description": "CREATE — **ekran görüntüsü 2/5**. Sonraki istekler `{{gorev_id}}` kullanır."
+          }
+        },
+        {
+          "name": "GET — Tek görev",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Görev bulundu', () => pm.expect(json.gorev).to.be.an('object'));",
+                  "pm.test('Doğru id', () => pm.expect(json.gorev.id).to.eql(pm.environment.get('gorev_id')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{temel_url}}/gorevler/{{gorev_id}}",
+            "description": "READ — **ekran görüntüsü 3/5**"
+          }
+        },
+        {
+          "name": "PUT — Görev güncelle",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Güncellendi', () => pm.expect(json.basarili).to.eql(true));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"baslik\": \"Postman test görevi (güncellendi)\",\n  \"durum\": \"devam_ediyor\",\n  \"oncelik\": \"yuksek\"\n}"
+            },
+            "url": "{{temel_url}}/gorevler/{{gorev_id}}",
+            "description": "UPDATE — **ekran görüntüsü 4/5**"
+          }
+        },
+        {
+          "name": "DELETE — Görev sil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('Silindi', () => pm.expect(json.basarili).to.eql(true));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{temel_url}}/gorevler/{{gorev_id}}",
+            "description": "DELETE — **ekran görüntüsü 5/5**"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 — Günlük raporlar",
+      "description": "Oturum zorunlu (`X-Oturum-Anahtari`). Üye klasörü + Admin klasörü.",
+      "item": [
+        {
+          "name": "Üye",
+          "item": [
+            {
+              "name": "GET — Bugün durum",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                      "const json = pm.response.json();",
+                      "pm.test('basarili', () => pm.expect(json.basarili).to.eql(true));",
+                      "pm.test('tarih var', () => pm.expect(json.tarih).to.match(/^\\d{4}-\\d{2}-\\d{2}$/));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }],
+                "url": "{{temel_url}}/gunluk-raporlar/bugun",
+                "description": "`dolduruldu`, `yoneticiHatirlatma` alanlarına bak."
+              }
+            },
+            {
+              "name": "GET — Rapor geçmişim",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                      "const json = pm.response.json();",
+                      "pm.test('raporlar dizisi', () => pm.expect(json.raporlar).to.be.an('array'));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }],
+                "url": "{{temel_url}}/gunluk-raporlar"
+              }
+            },
+            {
+              "name": "POST — Günlük rapor gönder",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                      "const json = pm.response.json();",
+                      "pm.test('Kaydedildi', () => pm.expect(json.basarili).to.eql(true));",
+                      "pm.test('rapor nesnesi', () => pm.expect(json.rapor).to.be.an('object'));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"yapilanlar\": \"Postman ile günlük rapor testi — bugün API ve arayüz.\",\n  \"planlar\": \"Yarın Postman ekran görüntüleri ve teslim dosyası.\",\n  \"engeller\": \"\"\n}"
+                },
+                "url": "{{temel_url}}/gunluk-raporlar",
+                "description": "Zorunlu: `yapilanlar`, `planlar`. Aynı gün tekrar gönderirsen günceller."
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin",
+          "description": "Önce **1 — Oturum → Giriş yap (admin)** çalıştır.",
+          "item": [
+            {
+              "name": "GET — Ekip takibi (bugün)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                      "const json = pm.response.json();",
+                      "pm.test('Admin özeti', () => pm.expect(json.ozet).to.be.an('object'));",
+                      "pm.test('kullanicilar listesi', () => pm.expect(json.kullanicilar).to.be.an('array'));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }],
+                "url": "{{temel_url}}/gunluk-raporlar/takip",
+                "description": "403 alırsan admin oturumu yok — **Giriş yap (admin)**."
+              }
+            },
+            {
+              "name": "POST — Hatırlat (tek kullanıcı)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                      "const json = pm.response.json();",
+                      "pm.test('basarili', () => pm.expect(json.basarili).to.eql(true));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"kullaniciId\": \"{{kullanici_id}}\"\n}"
+                },
+                "url": "{{temel_url}}/gunluk-raporlar/takip/hatirlat",
+                "description": "Demo üye id varsayılan `2`. **Ben (oturum)** ile kendi id'n de yazılır."
+              }
+            },
+            {
+              "name": "POST — Hatırlat (tüm eksikler)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                      "const json = pm.response.json();",
+                      "pm.test('basarili', () => pm.expect(json.basarili).to.eql(true));"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tumu\": true\n}"
+                },
+                "url": "{{temel_url}}/gunluk-raporlar/takip/hatirlat",
+                "description": "Raporu doldurmamış tüm kullanıcılara uygulama içi hatırlatma kaydı."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4 — Haftalık ikram",
+      "description": "Oturumdaki çalışanın bu hafta en çok yediği ve içtiği. Önce giriş yap.",
+      "item": [
+        {
+          "name": "GET — Bu haftanın favorileri",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "pm.test('basarili', () => pm.expect(json.basarili).to.eql(true));",
+                  "pm.test('hafta aralığı', () => pm.expect(json.hafta.baslangic).to.match(/^\\d{4}-\\d{2}-\\d{2}$/));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }],
+            "url": "{{temel_url}}/ikram/hafta",
+            "description": "`yemek` ve `icecek` bu haftanın en yüksek adetleri. Kayıt yoksa null."
+          }
+        },
+        {
+          "name": "POST — Bugünkü öğün",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "pm.test('Kaydedildi', () => pm.expect(json.basarili).to.eql(true));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-Oturum-Anahtari", "value": "{{oturum_anahtari}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"yemek\": \"Mercimek çorbası\",\n  \"icecek\": \"Türk kahvesi\"\n}"
+            },
+            "url": "{{temel_url}}/ikram",
+            "description": "En az biri zorunlu. Aynı gün tekrar gönderilirse adet artar. Tarih İstanbul saatine göre bugündür."
+          }
+        }
+      ]
+    }
+  ]
+}
