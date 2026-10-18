@@ -1,20 +1,22 @@
 # TASKFLOW
 
-TASKFLOW, görevleri kaydetmek için kurduğumuz sunucu. Node.js ve Express çalışıyor. Görev, kullanıcı, günlük rapor ve yemek kayıtları JSON dosyalarında duruyor. Tarayıcıyı açınca bir panel de çıkıyor.
+Bu, backend eğitimi için kurduğum görev sunucusu. Node.js ve Express kullanıyor. Görevler, kullanıcılar, günlük raporlar ve yemek kayıtları JSON dosyalarında duruyor. Tarayıcıda bir panel de açılıyor.
 
-Adres varsayılan olarak [http://localhost:3000](http://localhost:3000). Durum kontrolü [http://localhost:3000/durum](http://localhost:3000/durum) adresidir. Cevap şöyle olmalı:
+Panel: [http://localhost:3000](http://localhost:3000)
+
+Sunucu ayakta mı diye bakmak için: [http://localhost:3000/durum](http://localhost:3000/durum)
 
 ```json
 { "basarili": true, "mesaj": "TASKFLOW API ayakta" }
 ```
 
-## Görevler
+## Yönergede benden istenenler
 
-Görev eklenir, listelenir, tek tek açılır, değiştirilir ve silinir. Bu işler için giriş şart değil.
+Eğitimde teslim etmem istenenler şunlardı. Hepsi bu depoda var.
 
-Yeni görevde başlık yazılır. Açıklama, öncelik, durum ve atanan kişi boş kalabilir. Öncelik `dusuk`, `orta`, `yuksek` veya `acil` olur. Yazılmazsa `orta` sayılır. Durum `beklemede`, `devam_ediyor` veya `tamamlandi` olur. Yazılmazsa `beklemede` kalır. Başlık boşsa ya da öncelik ve durum bu listeden değilse sunucu 400 döner.
+Çalışan bir REST API kurdum. Görev eklenebiliyor, listelenebiliyor, tek tek açılabiliyor, değiştirilebiliyor ve silinebiliyor. Giriş gerekmez.
 
-Numarayı, oluşturulma saatini ve son değişiklik saatini sunucu kendisi yazar.
+Yeni görevde başlık zorunlu. Açıklama, öncelik, durum ve atanan kişi boş kalabilir. Öncelik şunlardan biri olur: `dusuk`, `orta`, `yuksek`, `acil`. Yazılmazsa `orta` kabul edilir. Durum şunlardan biri olur: `beklemede`, `devam_ediyor`, `tamamlandi`. Yazılmazsa `beklemede` kalır. Başlık boşsa ya da öncelik ile durum bu listede yoksa sunucu 400 döner. Kayıt numarasını ve saatleri sunucu kendisi yazar.
 
 ```json
 {
@@ -26,32 +28,36 @@ Numarayı, oluşturulma saatini ve son değişiklik saatini sunucu kendisi yazar
 }
 ```
 
-| Ne yapılacak | Adres |
-|--------------|--------|
-| Hepsini getir | GET `/gorevler` |
-| Birini getir | GET `/gorevler/:id` |
-| Ekle | POST `/gorevler` |
-| Değiştir | PUT `/gorevler/:id` |
-| Sil | DELETE `/gorevler/:id` |
+| Ne yapıyorum | Adres | Sonuç |
+|--------------|--------|--------|
+| Liste | `GET /gorevler` | 200 |
+| Tek görev | `GET /gorevler/:id` | 200 |
+| Ekleme | `POST /gorevler` | 201 |
+| Güncelleme | `PUT /gorevler/:id` | 200 |
+| Silme | `DELETE /gorevler/:id` | 200 |
 
-Ekleme 201 döner. Diğerleri yolunda giderse 200 döner. Kayıtlar `data/gorevler.json` içindedir.
+Kayıtlar `data/gorevler.json` dosyasındadır.
 
-## İstek günlüğü
+Her gelen istekte yöntem, adres ve saat yazılır. Satır terminalde görünür ve `gunluk/istekler.log` dosyasına eklenir. Günlük dosyalarını depoya koymadım.
 
-Gelen her istekte üç şey yazılır: yöntem, adres ve saat. Satır hem terminalde görünür hem `gunluk/istekler.log` dosyasına eklenir. Bu günlük dosyaları GitHub’a konmaz.
+Ayrıca kısa bir proje tanıtımı, bu kurulum notu, kaynak kod, `package.json` ve Postman ekran görüntüleri istendi. Tanıtım `docs/PROJE_TANITIM.md` içindedir. Görüntüler aşağıda.
 
-## Giriş
+Yönergede filtre, arama, sayfalama ve rapor adresleri de vardı ama onlar notun dışındaydı. Onları yapmadım.
 
-Panelde iki deneme hesabı var. İkisi de aynı giriş ekranından girer. Ayrı bir admin sitesi yok.
+## Bunun dışında eklediklerim
 
-| E-posta | Şifre | Ne görür |
-|---------|--------|----------|
+Bunlar yönergede yoktu. Kendim ekledim.
+
+**Giriş.** İki deneme hesabı var. İkisi de aynı ekrandan girer. Ayrı bir admin sayfası yok.
+
+| E-posta | Şifre | Ne işe yarar |
+|---------|--------|----------------|
 | uye@taskflow.com | 123456 | kendi raporu ve kendi yemek kartı |
 | admin@taskflow.com | admin123 | bunlara ek olarak ekibin rapor takibi |
 
-Şifreler düz yazılmaz. Dosyada bcrypt ile durur. Bunlar sadece deneme şifresidir.
+Şifre dosyada düz durmaz, bcrypt ile saklanır. Bunlar sadece deneme içindir.
 
-Giriş `POST /giris` ile olur:
+Giriş adresi `POST /giris`. Gövde:
 
 ```json
 {
@@ -60,46 +66,36 @@ Giriş `POST /giris` ile olur:
 }
 ```
 
-Cevaptaki anahtar sonraki isteklerde başlığa yazılır:
+Cevaptaki anahtarı sonraki istekte başlığa yazıyorum:
 
 ```
 X-Oturum-Anahtari: <giris-cevabindaki-anahtar>
 ```
 
-`GET /ben` giriş yapan kişiyi söyler. `POST /cikis` oturumu kapatır.
+`GET /ben` giriş yapan kişiyi verir. `POST /cikis` oturumu kapatır.
 
-## Günlük rapor
+**Günlük rapor.** Üye bugün ne yaptığını ve yarın ne yapacağını yazar. Engel varsa onu da ekler. Aynı gün ikinci kez yazarsa yeni rapor açılmaz, eski kayıt güncellenir. Admin, bugün kimin yazdığına bakar. Yazmayan kişiye hatırlatma gider. Üye bunu kendi ekranında görür.
 
-Üye, bugün ne yaptığını ve yarın ne yapacağını yazar. Engel varsa onu da ekleyebilir. Aynı gün tekrar yazarsa kayıt güncellenir, ikinci bir rapor açılmaz.
+| Ne | Adres | Kim |
+|----|--------|-----|
+| Bugünkü durum | `GET /gunluk-raporlar/bugun` | üye |
+| Raporu kaydet | `POST /gunluk-raporlar` | üye |
+| Ekibe bak | `GET /gunluk-raporlar/takip` | admin |
+| Hatırlat | `POST /gunluk-raporlar/takip/hatirlat` | admin |
 
-Admin, ekibin bugün raporu doldurup doldurmadığına bakar. Boş olan kişiye hatırlatma gider. Üye kendi ekranında bu hatırlatmayı görür.
+**Panel.** Soldan görevler, projeler, bildirimler, Fly Bird ve Hafıza açılır. Üstteki zil bildirim sayfasına gider. Orada rapor hatırlatması ve sabit duyurular durur.
 
-| Ne yapılacak | Adres | Kim |
-|--------------|--------|-----|
-| Bugünkü durum | GET `/gunluk-raporlar/bugun` | üye |
-| Raporu kaydet | POST `/gunluk-raporlar` | üye |
-| Ekibe bak | GET `/gunluk-raporlar/takip` | admin |
-| Hatırlat | POST `/gunluk-raporlar/takip/hatirlat` | admin |
+Fly Bird yavaş bir kuş oyunu. Boruların arasından geçince skor artar. Sağda ekip sıralaması var. Skor tarayıcıda kalır.
 
-## Panel
+Hafıza, aynı iki kartı bulma oyunu. En iyi hamle sayısı da tarayıcıda kalır.
 
-Girişten sonra sol menüden görevler, projeler, bildirimler, Fly Bird ve Hafıza açılır. Üstteki zil bildirim sayfasına gider. Bildirimde günlük rapor hatırlatması ve sabit duyurular durur.
+**Yemek ve kahve.** Sol menünün altında bir kart var. Giriş yapan kişi bu hafta en çok ne yediğini ve en çok ne içtiğini görür. Başka birinin kaydı bu kartta çıkmaz.
 
-Fly Bird yavaş uçan bir kuş oyunu. Boruların arasından geçince skor artar. Sağda ekip sıralaması var. Skor tarayıcıda saklanır, sayfa yenilenince de durur.
+Hafta İstanbul saatine göre pazartesi başlar, pazar biter. Bu aralıktaki kayıtlar sayılır. En çok yazılan yemek bir yana, en çok yazılan içecek öbür yana gelir. Dört kez mercimek çorbası ve beş kez Türk kahvesi girildiyse kartta bu ikisi yazar. Altında kısa bir cümle de vardır.
 
-Hafıza, aynı kartı eşleştirme oyunu. En iyi hamle sayısı da tarayıcıda kalır.
+Form bugünün kaydını ekler. Yemek, içecek ya da ikisi birden yazılır. İkisi de boşsa kayıt olmaz. Ad en az 2, en fazla 40 karakter olabilir. Tarih formdan seçilmez. Sunucu bugünün İstanbul tarihini yazar. Her kayıt sayıyı bir artırır. “Türk kahvesi” ile “türk kahvesi” aynı içecek sayılır.
 
-## Yemek ve kahve
-
-Sol menünün altında bir kart var. Giriş yapan kişiye, bu hafta en çok ne yediğini ve en çok ne içtiğini gösterir. Başkasının kaydı o kartta çıkmaz.
-
-Hafta İstanbul saatine göre sayılır. Pazartesi başlar, pazar biter. Bu aralıktaki kayıtlar toplanır. Yemekte en yüksek sayı kartın bir yanına, içecekte en yüksek sayı öbür yanına yazılır. Dört kez mercimek çorbası, beş kez Türk kahvesi girildiyse kartta bu ikisi görünür. Altında kısa bir cümle vardır: bu hafta en çok ne yediğin ve ne içtiğin.
-
-Kartın içindeki form bugünü ekler. Yemek yazılır, içecek yazılır ya da ikisi birden yazılır. İkisi de boş bırakılırsa kayıt olmaz. Ad en az 2, en fazla 40 karakter olabilir. Gün, formdan seçilmez. Sunucu o anki İstanbul tarihini yazar. Her kayıt sayıyı bir artırır. “Türk kahvesi” ile “türk kahvesi” aynı içecek sayılır.
-
-Kayıtlar `data/ikramlar.json` dosyasındadır. Bu iki adres oturum ister:
-
-Bugünü eklemek:
+Kayıtlar `data/ikramlar.json` içindedir. İki adres de oturum ister.
 
 ```json
 POST /ikram
@@ -109,11 +105,11 @@ POST /ikram
 }
 ```
 
-Bu haftayı okumak: `GET /ikram/hafta`
+Bu haftanın özeti: `GET /ikram/hafta`
 
-## Nasıl açılır
+## Nasıl çalıştırılır
 
-Bilgisayarda Node.js 18 veya daha yenisi olmalı.
+Node.js 18 veya daha yenisi gerekir.
 
 ```bash
 cd taskflow
@@ -121,36 +117,58 @@ npm install
 npm run dev
 ```
 
-Dosya değişince sunucu kendiliğinden yeniden başlar. Bir kez açıp bırakmak için `npm start` yeter.
+Dosya değişince sunucu yeniden başlar. Bir kez açmak için `npm start` yeter.
 
-3000 portu başka programdaysa PowerShell’de şunu yaz:
+3000 portu doluysa PowerShell’de:
 
 ```powershell
 $env:PORT=3010; npm run dev
 ```
 
-O zaman panel `http://localhost:3010` olur. Postman görüntüleri de bu yüzden 3010 üzerinden çekildi. Proje kendi haline bırakılırsa 3000 kullanır.
+Panel o zaman `http://localhost:3010` olur. Aşağıdaki görüntüler de 3010 üzerinden alındı. Port verilmezse sunucu 3000 kullanır.
 
-## Postman
+## Postman görüntüleri
 
-Sunucu açıkken Postman’de iki dosya içe aktarılır:
+Sunucu açıkken Postman’e şu iki dosya aktarılır:
 
 - `postman/TASKFLOW.postman_collection.json`
 - `postman/TASKFLOW-Yerel.postman_environment.json`
 
-Sağ üstten **TASKFLOW Yerel** seçilir. `temel_url`, sunucunun açık olduğu adrestir.
+Sağ üstten **TASKFLOW Yerel** seçilir. `temel_url` sunucunun adresidir.
 
-Beş görüntü sırayla çekildi: liste, ekleme, tek görev, güncelleme, silme. Dosyalar burada:
+Beş görüntüyü sırayla çektim: liste, ekleme, tek görev, güncelleme, silme.
 
-| Dosya | Ne görünüyor |
-|--------|----------------|
-| `docs/ekran-goruntuleri/01-listeleme.png` | GET `/gorevler` |
-| `docs/ekran-goruntuleri/02-ekleme.png` | POST `/gorevler` |
-| `docs/ekran-goruntuleri/03-detay.png` | GET `/gorevler/:id` |
-| `docs/ekran-goruntuleri/04-guncelleme.png` | PUT `/gorevler/:id` |
-| `docs/ekran-goruntuleri/05-silme.png` | DELETE `/gorevler/:id` |
+### 1. Listeleme
 
-Tıklama sırası `docs/POSTMAN.md` içinde. Adreslerin tam listesi `docs/API_TASARIM.md` içinde. Görev alanları `docs/VERI_MODELI.md` içinde. Kısa tanıtım `docs/PROJE_TANITIM.md` içinde.
+`GET /gorevler` — 200
+
+![Görev listesi](docs/ekran-goruntuleri/01-listeleme.png)
+
+### 2. Ekleme
+
+`POST /gorevler` — 201
+
+![Yeni görev](docs/ekran-goruntuleri/02-ekleme.png)
+
+### 3. Tek görev
+
+`GET /gorevler/:id` — 200
+
+![Görev detayı](docs/ekran-goruntuleri/03-detay.png)
+
+### 4. Güncelleme
+
+`PUT /gorevler/:id` — 200
+
+![Görev güncelleme](docs/ekran-goruntuleri/04-guncelleme.png)
+
+### 5. Silme
+
+`DELETE /gorevler/:id` — 200
+
+![Görev silme](docs/ekran-goruntuleri/05-silme.png)
+
+Tıklama sırası `docs/POSTMAN.md` içinde. Adres listesi `docs/API_TASARIM.md` içinde. Görev alanları `docs/VERI_MODELI.md` içinde.
 
 ## Dosyalar
 
@@ -161,7 +179,7 @@ src/rotalar/          adresler
 src/denetleyiciler/   isteğe verilen cevap
 src/servisler/        JSON dosyasını okuyup yazan kısım
 src/araKatman/        istek günlüğü
-public/               panelin sayfası
+public/               panel
 data/                 JSON kayıtlar
 postman/              Postman dosyaları
 docs/                 tanıtım, API notu, ekran görüntüleri
