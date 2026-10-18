@@ -42,7 +42,7 @@ Her gelen istekte yöntem, adres ve saat yazılır. Satır terminalde görünür
 
 Ayrıca kısa bir proje tanıtımı, bu kurulum notu, kaynak kod, `package.json` ve Postman ekran görüntüleri istendi. Tanıtım `docs/PROJE_TANITIM.md` içindedir. Görüntüler aşağıda.
 
-Yönergede filtre, arama, sayfalama ve rapor adresleri de vardı ama onlar notun dışındaydı. Onları yapmadım.
+Yönergenin nota girmeyen ileri kısmı da duruyor: süzme, arama, sayfalama, sıralama, doğrulama katmanı ve görev sayımı. Onları da ekledim. Nasıl çalıştıkları aşağıdaki başlıkta.
 
 ## Bunun dışında eklediklerim
 
@@ -106,6 +106,22 @@ POST /ikram
 ```
 
 Bu haftanın özeti: `GET /ikram/hafta`
+
+## İleri liste ve sayım
+
+Bu bölüm yönergede vardı ama nota dahil değildi. Yine de ekledim. `GET /gorevler` adresine hiçbir soru eklenmezse liste eskisi gibi tam gelir. Paneldeki görevler bu yüzden duruyor.
+
+Duruma göre süzmek için adresin sonuna `?durum=tamamlandi` yazılır. İngilizce karşılığı `?status=completed`. Öncelik için `?oncelik=yuksek` veya `?priority=high`. İkisi birden de yazılabilir.
+
+Arama ayrı bir adrestir: `GET /gorevler/ara?kelime=şema`. Aynı iş `GET /gorevler/search?keyword=şema` ile de olur. Aranan kelime başlığa, açıklamaya ve atanana bakar. Büyük küçük harf fark etmez.
+
+Bir kişiye bakmak için `GET /gorevler/atanan/uye@taskflow.com`. İngilizce yolu `GET /gorevler/assignee/musa`.
+
+Sayfa için `?sayfa=1&limit=10`. `limit` en fazla 100 olur. Sıra için `?sirala=olusturulma`. Bu eskiden yeniye dizer. Yeniden eskiye için başına eksi konur: `?sirala=-olusturulma`. `sort=createdAt` de aynı işi görür.
+
+Görev eklenirken ve güncellenirken logger’dan ayrı bir doğrulama katmanı çalışır. Başlık boşsa, açıklama metin değilse, öncelik listede yoksa veya atanan kişi çok uzunsa cevap 400 olur. Gövde Türkçe de olabilir, İngilizce de: `title`, `description`, `priority`, `assignee`. `priority` değeri `high` gelirse içeride `yuksek` diye saklanır.
+
+Sayım adresleri giriş istemez. Tamamlananlar `GET /reports/completed`. Bekleyenler, yani durumu `beklemede` olanlar, `GET /reports/pending`. Genel sayım `GET /reports/summary`. Özet toplamı, üç durumu ve dört önceliği ayrı ayrı söyler. Türkçe adresler de aynı cevabı verir: `/raporlar/tamamlanan`, `/raporlar/bekleyen`, `/raporlar/ozet`.
 
 ## Nasıl çalıştırılır
 
@@ -178,7 +194,7 @@ src/uygulama.js       Express ayarı
 src/rotalar/          adresler
 src/denetleyiciler/   isteğe verilen cevap
 src/servisler/        JSON dosyasını okuyup yazan kısım
-src/araKatman/        istek günlüğü
+src/araKatman/        istek günlüğü ve görev doğrulaması
 public/               panel
 data/                 JSON kayıtlar
 postman/              Postman dosyaları

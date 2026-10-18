@@ -14,6 +14,15 @@ Sunucu: `http://localhost:3000`
 | POST | `/gorevler` | Yeni görev |
 | PUT | `/gorevler/:id` | Görev güncelle |
 | DELETE | `/gorevler/:id` | Görev sil |
+| GET | `/gorevler?durum=tamamlandi` | Duruma göre süz (`status=completed` de olur) |
+| GET | `/gorevler?oncelik=yuksek` | Önceliğe göre süz (`priority=high` de olur) |
+| GET | `/gorevler/ara?kelime=şema` | Başlık, açıklama ve atananda ara (`/search?keyword=` de olur) |
+| GET | `/gorevler/atanan/:kisi` | Atanan kişiye göre liste (`/assignee/:kisi` de olur) |
+| GET | `/gorevler?sayfa=1&limit=10` | Sayfalama. Parametre yoksa liste eskisi gibi tam gelir |
+| GET | `/gorevler?sirala=olusturulma` | Sırala. Başına `-` konursa ters döner (`sort=createdAt`) |
+| GET | `/reports/completed` | Tamamlanan görevler (`/raporlar/tamamlanan`) |
+| GET | `/reports/pending` | Bekleyen görevler (`/raporlar/bekleyen`) |
+| GET | `/reports/summary` | Toplam, durum ve öncelik sayıları (`/raporlar/ozet`) |
 | GET | `/gunluk-raporlar` | Oturumlu kullanıcının raporları |
 | GET | `/gunluk-raporlar/bugun` | Bugün dolduruldu mu + kayıt + yönetici hatırlatması |
 | POST | `/gunluk-raporlar` | Günlük rapor kaydet/güncelle (oturum) |

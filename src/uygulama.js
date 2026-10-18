@@ -28,7 +28,9 @@ uygulama.use((req, res) => {
     req.path === "/cikis" ||
     req.path === "/ben" ||
     req.path.startsWith("/gunluk-raporlar") ||
-    req.path.startsWith("/ikram")
+    req.path.startsWith("/ikram") ||
+    req.path.startsWith("/reports") ||
+    req.path.startsWith("/raporlar")
   ) {
     return res.status(404).json({ basarili: false, mesaj: "Böyle bir adres yok" });
   }

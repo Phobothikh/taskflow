@@ -496,6 +496,88 @@
           }
         }
       ]
+    },
+    {
+      "name": "5 — İleri liste ve rapor",
+      "description": "Yönergenin isteğe bağlı kısmı. Görev uçları oturum istemez.",
+      "item": [
+        {
+          "name": "GET — Duruma göre",
+          "request": {
+            "method": "GET",
+            "url": "{{temel_url}}/gorevler?durum=beklemede"
+          }
+        },
+        {
+          "name": "GET — Önceliğe göre",
+          "request": {
+            "method": "GET",
+            "url": "{{temel_url}}/gorevler?priority=high"
+          }
+        },
+        {
+          "name": "GET — Ara",
+          "request": {
+            "method": "GET",
+            "url": "{{temel_url}}/gorevler/ara?kelime=kontrol"
+          }
+        },
+        {
+          "name": "GET — Atanan kişi",
+          "request": {
+            "method": "GET",
+            "url": "{{temel_url}}/gorevler/atanan/uye@taskflow.com"
+          }
+        },
+        {
+          "name": "GET — Sayfa",
+          "request": {
+            "method": "GET",
+            "url": "{{temel_url}}/gorevler?sayfa=1&limit=10"
+          }
+        },
+        {
+          "name": "GET — Sırala",
+          "request": {
+            "method": "GET",
+            "url": "{{temel_url}}/gorevler?sirala=-olusturulma"
+          }
+        },
+        {
+          "name": "GET — Tamamlananlar",
+          "request": {
+            "method": "GET",
+            "url": "{{temel_url}}/reports/completed"
+          }
+        },
+        {
+          "name": "GET — Bekleyenler",
+          "request": {
+            "method": "GET",
+            "url": "{{temel_url}}/reports/pending"
+          }
+        },
+        {
+          "name": "GET — Özet",
+          "request": {
+            "method": "GET",
+            "url": "{{temel_url}}/reports/summary"
+          }
+        },
+        {
+          "name": "POST — İngilizce alan, bozuk öncelik",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"priority\": \"yanlis\"\n}"
+            },
+            "url": "{{temel_url}}/gorevler",
+            "description": "400 beklenir. Doğrulama katmanı."
+          }
+        }
+      ]
     }
   ]
 }
