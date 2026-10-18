@@ -1,17 +1,56 @@
 # TASKFLOW
 
-Yazılım ekibinin görevlerini tek bir REST API üzerinden açıp izleyebilmesi için yazılmış eğitim projesi. Node.js ve Express ile çalışır. Görevler, kullanıcılar ve günlük raporlar JSON dosyalarında durur; ayrıca tarayıcıdan açılan bir panel vardır.
+Ekibin görevlerini tek yerden açıp takip etmesi için yazılmış bir eğitim projesi. Sunucu Node.js ve Express ile çalışır. Kayıtlar JSON dosyalarında durur. Aynı projede tarayıcıdan açılan bir panel de vardır.
 
-## Ne yapar
+## Yönergede istenenler
 
-- Görev ekleme, listeleme, tek kayıt getirme, güncelleme ve silme
-- Her isteği konsola ve `gunluk/istekler.log` dosyasına yazan günlük katmanı
-- E-posta ve şifre ile giriş, oturum anahtarı, çıkış
-- Üye için günlük rapor, admin için ekip takibi ve hatırlatma
-- Oturumdaki çalışanın bu hafta en çok yediği ve içtiği kaydı
-- Panel: görev listesi, bildirimler, Fly Bird ve Hafıza
+Eğitimin zorunlu teslimi şunlardı. Hepsi bu depoda hazır:
 
-## Gereksinim
+- Çalışan bir REST API
+- Görev ekleme, listeleme, detay görme, güncelleme ve silme
+- Her isteğin yöntemini, adresini ve zamanını kaydeden bir ara katman
+- Kısa proje tanıtımı (`docs/PROJE_TANITIM.md`)
+- Kurulum notu (bu dosya)
+- Kaynak kod ve `package.json`
+- Postman’de beş CRUD ekran görüntüsü (`docs/ekran-goruntuleri`)
+- Herkese açık GitHub deposu
+
+Yönergedeki filtre, arama, sayfalama ve rapor adresleri nota dahil değildi. Onlar bu projede yok.
+
+## Benim eklediklerim
+
+Aşağıdakiler yönergede yoktu. Panele ve API’ye sonradan eklendi:
+
+- Üye ve admin girişi. Ayrı bir admin sitesi yok; aynı ekrandan girilir.
+- Üyenin günlük raporu. Admin, ekibin bugün raporu yazıp yazmadığına bakar ve eksik olana hatırlatma gönderir.
+- Görev listesi, projeler ve bildirim zili olan tarayıcı paneli
+- Fly Bird oyunu ve ekip sıralaması
+- Hafıza oyunu
+- Sol menüde, o hafta en çok yenilen yemek ve en çok içilen içecek. Ayrıntısı bir sonraki başlıkta.
+
+## Haftalık yemek ve içecek
+
+Bu kart, giriş yapan kişiye haftalık bir hatırlatma olsun diye duruyor. Başka bir çalışanın tabağı görünmez.
+
+Hafta İstanbul saatine göre pazartesiden pazara kadardır. Sistem bu aralıktaki kayıtları sayar. En yüksek sayıyı alan yemek ve en yüksek sayıyı alan içecek kartta yazar. Örneğin bir kişi o hafta dört kez mercimek çorbası, beş kez Türk kahvesi girdiyse kartta bunlar görünür. Altında kısa bir cümle vardır: bu hafta en çok ne yediği ve ne içtiği.
+
+Sol menünün altındaki form bugünün kaydını ekler. Yemek, içecek ya da ikisi birden yazılabilir. İkisi de boşsa kayıt alınmaz. Ad en az 2, en fazla 40 karakter olabilir. Tarih sunucuda bugünün tarihi olarak yazılır; formdan eski bir gün seçilmez. Her kayıt o kişinin sayısına bir ekler. Türk kahvesi ile türk kahvesi aynı içecek sayılır.
+
+Kayıtlar `data/ikramlar.json` dosyasındadır. İki adres oturum ister. Başlık: `X-Oturum-Anahtari`.
+
+Bugünkü öğünü yazmak:
+
+```json
+POST /ikram
+{
+  "yemek": "Mercimek çorbası",
+  "icecek": "Türk kahvesi"
+}
+```
+
+Bu haftanın özetini okumak: `GET /ikram/hafta`
+
+## Gereksinimler
 
 - Node.js 18 veya üzeri
 - npm
@@ -25,13 +64,13 @@ npm install
 
 ## Çalıştırma
 
-Geliştirme (dosya değişince yeniden başlar):
+Dosya değişince yeniden başlasın:
 
 ```bash
 npm run dev
 ```
 
-Tek seferlik:
+Bir kez başlatmak için:
 
 ```bash
 npm start
@@ -39,7 +78,7 @@ npm start
 
 Panel: [http://localhost:3000](http://localhost:3000)
 
-Sağlık kontrolü: [http://localhost:3000/durum](http://localhost:3000/durum)
+Durum kontrolü: [http://localhost:3000/durum](http://localhost:3000/durum)
 
 Beklenen cevap:
 
@@ -47,13 +86,13 @@ Beklenen cevap:
 { "basarili": true, "mesaj": "TASKFLOW API ayakta" }
 ```
 
-Port 3000 başka bir programdaysa:
+3000 portu doluysa:
 
 ```powershell
 $env:PORT=3010; npm run dev
 ```
 
-Bu durumda adres `http://localhost:3010` olur. Repodaki Postman görüntüleri bu yüzden 3010 portundan alınmıştır. Uygulama varsayılan olarak 3000 kullanır.
+Adres o zaman `http://localhost:3010` olur. Depodaki Postman görüntüleri bu yüzden 3010 üzerinden alınmıştır. Varsayılan port 3000’dir.
 
 ## Demo hesaplar
 
@@ -62,37 +101,33 @@ Bu durumda adres `http://localhost:3010` olur. Repodaki Postman görüntüleri b
 | uye@taskflow.com | 123456 | Üye |
 | admin@taskflow.com | admin123 | Admin |
 
-Ayrı bir admin adresi yok. Aynı giriş ekranından admin hesabıyla girilir. Şifreler yalnızca bu demo içindir.
-
-## Panel
-
-Girişten sonra sol menüden görevler, projeler, bildirimler, Fly Bird ve Hafıza açılır. Üstteki zil bildirim sayfasına gider. Sol alttaki kart, giriş yapan kişinin bu hafta en çok yediği yemeği ve içtiği içeceği gösterir.
+Şifreler yalnızca bu deneme içindir. Veritabanında düz metin durmaz; bcrypt ile saklanır.
 
 ## API
 
 Kök adres: `http://localhost:3000`
 
-Oturum isteyen uçlar `X-Oturum-Anahtari` başlığını bekler. Bu değer `POST /giris` cevabındaki anahtardır. Görev uçları oturum istemez.
+Görev adresleri giriş istemez. Giriş, rapor ve ikram adresleri `X-Oturum-Anahtari` başlığını bekler. Anahtar, `POST /giris` cevabında gelir.
 
-| İşlem | Adres | Kim kullanır | Ne döner |
-|--------|--------|----------------|----------|
-| GET | `/durum` | herkes | API ayakta mı |
+| Yöntem | Adres | Kim | Sonuç |
+|--------|--------|-----|--------|
+| GET | `/durum` | herkes | API çalışıyor mu |
 | POST | `/giris` | herkes | oturum anahtarı |
-| GET | `/ben` | oturum | giriş yapan kullanıcı |
+| GET | `/ben` | oturum | giriş yapan kişi |
 | POST | `/cikis` | oturum | oturumu kapatır |
-| GET | `/gorevler` | herkes | tüm görevler |
+| GET | `/gorevler` | herkes | bütün görevler |
 | GET | `/gorevler/:id` | herkes | tek görev |
 | POST | `/gorevler` | herkes | yeni görev, 201 |
 | PUT | `/gorevler/:id` | herkes | güncellenmiş görev |
-| DELETE | `/gorevler/:id` | herkes | silme onayı |
-| GET | `/gunluk-raporlar/bugun` | üye | bugünkü rapor durumu |
-| POST | `/gunluk-raporlar` | üye | rapor kaydı |
-| GET | `/gunluk-raporlar/takip` | admin | ekibin bugünkü durumu |
+| DELETE | `/gorevler/:id` | herkes | silindi onayı |
+| GET | `/gunluk-raporlar/bugun` | üye | bugünkü rapor |
+| POST | `/gunluk-raporlar` | üye | raporu kaydeder |
+| GET | `/gunluk-raporlar/takip` | admin | ekibin bugünkü hali |
 | POST | `/gunluk-raporlar/takip/hatirlat` | admin | eksik raporu hatırlatır |
-| GET | `/ikram/hafta` | oturum | haftanın favori yemek ve içeceği |
+| GET | `/ikram/hafta` | oturum | haftanın yemeği ve içeceği |
 | POST | `/ikram` | oturum | bugünkü öğün |
 
-Ayrıntılı tablo: `docs/API_TASARIM.md`
+Ayrıntı: `docs/API_TASARIM.md`
 
 ### Görev gövdesi
 
@@ -114,17 +149,7 @@ Ayrıntılı tablo: `docs/API_TASARIM.md`
 | durum | hayır | `beklemede`, `devam_ediyor`, `tamamlandi` (varsayılan `beklemede`) |
 | atanan | hayır | e-posta veya isim |
 
-Sunucu `id`, `olusturulma` ve `guncellenme` alanlarını kendisi yazar. Eksik veya hatalı `baslik`, `oncelik` ya da `durum` için cevap **400** olur.
-
-Liste cevabı:
-
-```json
-{
-  "basarili": true,
-  "adet": 1,
-  "gorevler": []
-}
-```
+`id`, `olusturulma` ve `guncellenme` alanlarını sunucu yazar. Başlık boşsa ya da öncelik ve durum listedekilerden biri değilse cevap **400** olur.
 
 ### Giriş gövdesi
 
@@ -143,30 +168,30 @@ X-Oturum-Anahtari: <giris-cevabindaki-anahtar>
 
 ## İstek günlüğü
 
-Her API isteğinde method, adres ve zaman yazılır. Kayıt hem terminalde hem `gunluk/istekler.log` dosyasında durur. Log dosyaları depoya girmez.
+Her istekte yöntem, adres ve zaman yazılır. Satır hem terminalde hem `gunluk/istekler.log` dosyasında durur. Günlük dosyaları GitHub’a yüklenmez.
 
-## Veri
+## Veri dosyaları
 
-| Dosya | İçerik |
-|--------|--------|
+| Dosya | İçinde ne var |
+|--------|----------------|
 | `data/gorevler.json` | görevler |
-| `data/kullanicilar.json` | demo kullanıcılar, bcrypt şifre özeti |
+| `data/kullanicilar.json` | deneme kullanıcıları |
 | `data/gunlukRaporlar.json` | günlük raporlar |
-| `data/ikramlar.json` | haftalık yemek ve içecek kayıtları |
+| `data/ikramlar.json` | yemek ve içecek kayıtları |
 
-Model özeti: `docs/VERI_MODELI.md`  
-Proje tanıtımı: `docs/PROJE_TANITIM.md`
+Model: `docs/VERI_MODELI.md`  
+Tanıtım: `docs/PROJE_TANITIM.md`
 
 ## Postman
 
 1. Sunucuyu çalıştır.
-2. Postman → Import:
+2. Postman’de Import ile şu iki dosyayı al:
    - `postman/TASKFLOW.postman_collection.json`
    - `postman/TASKFLOW-Yerel.postman_environment.json`
 3. Ortam olarak **TASKFLOW Yerel** seç.
-4. `temel_url` değerini sunucunun adresine yaz (`http://localhost:3000` veya kullanılan port).
+4. `temel_url` değerini çalışan adrese yaz.
 
-CRUD kanıtı beş görüntüdür. Sıra: listeleme, ekleme, detay, güncelleme, silme.
+Beş görüntünün sırası: listeleme, ekleme, detay, güncelleme, silme.
 
 | Dosya | İstek |
 |--------|--------|
@@ -176,27 +201,27 @@ CRUD kanıtı beş görüntüdür. Sıra: listeleme, ekleme, detay, güncelleme,
 | `docs/ekran-goruntuleri/04-guncelleme.png` | PUT `/gorevler/:id` |
 | `docs/ekran-goruntuleri/05-silme.png` | DELETE `/gorevler/:id` |
 
-Adım adım not: `docs/POSTMAN.md`
+Adımlar: `docs/POSTMAN.md`
 
 ## Klasörler
 
 ```
-src/sunucu.js            giriş noktası
-src/uygulama.js          Express uygulaması
-src/rotalar/             URL eşlemesi
-src/denetleyiciler/      istek cevapları
+src/sunucu.js            programın başladığı yer
+src/uygulama.js          Express ayarı
+src/rotalar/             adresler
+src/denetleyiciler/      gelen isteğe verilen cevap
 src/servisler/           dosyadan okuma ve yazma
 src/araKatman/           istek günlüğü
-public/                  panel (HTML, CSS, JS)
+public/                  panel
 data/                    JSON kayıtlar
 postman/                 koleksiyon ve ortam
-docs/                    tanıtım, API, ekran görüntüleri
+docs/                    tanıtım, API notu, ekran görüntüleri
 ```
 
 ## Komutlar
 
 | Komut | Ne yapar |
 |--------|----------|
-| `npm install` | bağımlılıkları kurar |
-| `npm run dev` | geliştirme sunucusu |
+| `npm install` | paketleri kurar |
+| `npm run dev` | geliştirme sunucusunu açar |
 | `npm start` | sunucuyu bir kez başlatır |
