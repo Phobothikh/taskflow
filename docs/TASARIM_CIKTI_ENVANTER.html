@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TASKFLOW — Proje Envanteri (Tasarım Çıktısı)</title>
+    <style>
+      :root {
+        --text: #1a1a1a;
+        --muted: #444;
+        --border: #ccc;
+        --head: #f0f4f8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Calibri, Arial, sans-serif;
+        font-size: 11pt;
+        line-height: 1.45;
+        color: var(--text);
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 18mm 16mm;
+      }
+      h1 {
+        font-size: 18pt;
+        margin: 0 0 8pt;
+        line-height: 1.25;
+      }
+      h2 {
+        font-size: 13pt;
+        margin: 18pt 0 8pt;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 4pt;
+      }
+      h3 {
+        font-size: 11.5pt;
+        margin: 12pt 0 6pt;
+        color: var(--muted);
+      }
+      p {
+        margin: 0 0 8pt;
+      }
+      .meta {
+        background: var(--head);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10pt 12pt;
+        margin-bottom: 16pt;
+      }
+      .meta p {
+        margin: 4pt 0;
+      }
+      .fill {
+        border-bottom: 1px solid #999;
+        min-width: 180px;
+        display: inline-block;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8pt 0 12pt;
+        font-size: 10pt;
+      }
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 6pt 8pt;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: var(--head);
+        font-weight: 600;
+      }
+      code,
+      pre {
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 9.5pt;
+      }
+      pre {
+        background: #f6f8fa;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 10pt;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        margin: 8pt 0 12pt;
+      }
+      ul {
+        margin: 6pt 0 10pt;
+        padding-left: 18pt;
+      }
+      .note {
+        font-size: 10pt;
+        color: var(--muted);
+        font-style: italic;
+        margin-top: 12pt;
+      }
+      .footer {
+        margin-top: 20pt;
+        font-weight: 600;
+        text-align: center;
+        font-size: 10pt;
+      }
+      @media print {
+        body {
+          padding: 12mm;
+        }
+        h2 {
+          page-break-after: avoid;
+        }
+        table,
+        pre {
+          page-break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>TASKFLOW — Backend Geliştirme Proje Envanteri<br />(Tasarım Çıktısı)</h1>
+
+    <div class="meta">
+      <p><strong>Eğitim:</strong> Node.js Backend Programlama Eğitimi</p>
+      <p><strong>Teslim türü:</strong> Backend Geliştirme Proje Envanteri — Tasarım Çıktısı (PDF)</p>
+      <p><strong>Proje adı:</strong> TASKFLOW — Görev ve Proje Yönetim Sistemi API</p>
+      <p><strong>Öğrenci adı soyadı:</strong> Hatice Kübra Elma</p>
+    </div>
+
+    <h2>1. Proje tanıtımı</h2>
+
+    <h3>1.1 Amaç</h3>
+    <p>
+      Yazılım ekibinin görevlerini takip edebileceği, REST mantığında çalışan bir API tasarlamak ve geliştirmek. Proje;
+      Node.js, Express.js, routing, CRUD işlemleri ve temel middleware (istek günlüğü) konularını uygular.
+    </p>
+
+    <h3>1.2 Senaryo</h3>
+    <p>
+      Bir yazılım şirketi ekip içindeki görevleri, projeleri ve çalışan sorumluluklarını tek yerden izlemek istemektedir.
+      TASKFLOW; görev oluşturma, çalışana atama, durum ve öncelik takibi sunan API katmanını hedefler. Sistem tamamen REST
+      API mantığında tasarlanmıştır.
+    </p>
+
+    <h3>1.3 Sistem özeti (tasarım kapsamı)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Beklenti</th>
+          <th>Tasarım karşılığı</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Görev oluşturma</td><td><code>POST /gorevler</code></td></tr>
+        <tr><td>Görev listeleme</td><td><code>GET /gorevler</code></td></tr>
+        <tr><td>Görev detayı</td><td><code>GET /gorevler/:id</code></td></tr>
+        <tr><td>Görev güncelleme</td><td><code>PUT /gorevler/:id</code></td></tr>
+        <tr><td>Görev silme</td><td><code>DELETE /gorevler/:id</code></td></tr>
+        <tr><td>Atama</td><td>Görevde <code>atanan</code> alanı (e-posta veya isim)</td></tr>
+        <tr><td>Öncelik / durum</td><td><code>oncelik</code>, <code>durum</code> alanları (sabit değer listesi)</td></tr>
+        <tr><td>Veri saklama</td><td>JSON dosya (<code>data/gorevler.json</code>)</td></tr>
+        <tr><td>İstek izleme</td><td>Logger middleware → konsol + <code>gunluk/istekler.log</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.4 Teknoloji</h3>
+    <p>Node.js, Express.js, JSON dosya tabanlı kalıcı veri.</p>
+
+    <h2>2. Veri modeli tasarımı</h2>
+
+    <h3>2.1 Görev (Task)</h3>
+    <p>Kalıcılık: <code>data/gorevler.json</code> (dizi).</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Alan</th>
+          <th>Tip</th>
+          <th>Zorunlu</th>
+          <th>Açıklama</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>id</td><td>string (UUID)</td><td>evet</td><td>Sunucu üretir</td></tr>
+        <tr><td>baslik</td><td>string</td><td>evet</td><td>Görev adı</td></tr>
+        <tr><td>aciklama</td><td>string</td><td>hayır</td><td>Detay</td></tr>
+        <tr><td>oncelik</td><td>enum</td><td>hayır</td><td>dusuk, orta, yuksek, acil (varsayılan: orta)</td></tr>
+        <tr><td>durum</td><td>enum</td><td>hayır</td><td>beklemede, devam_ediyor, tamamlandi (varsayılan: beklemede)</td></tr>
+        <tr><td>atanan</td><td>string</td><td>hayır</td><td>Atanan kişi (e-posta veya isim)</td></tr>
+        <tr><td>olusturulma</td><td>ISO datetime</td><td>evet</td><td>Sunucu üretir</td></tr>
+        <tr><td>guncellenme</td><td>ISO datetime</td><td>evet</td><td>Sunucu günceller</td></tr>
+      </tbody>
+    </table>
+
+    <h3>2.2 Örnek kayıt</h3>
+    <pre>{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "baslik": "Veritabanı şeması",
+  "aciklama": "Tabloları çiz",
+  "oncelik": "yuksek",
+  "durum": "devam_ediyor",
+  "atanan": "uye@taskflow.com",
+  "olusturulma": "2026-10-12T09:00:00.000Z",
+  "guncellenme": "2026-10-12T10:30:00.000Z"
+}</pre>
+
+    <h2>3. API tasarım dokümanı (çekirdek uçlar)</h2>
+    <p><strong>Temel URL:</strong> <code>http://localhost:3000</code></p>
+
+    <h3>3.1 Sağlık</h3>
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Endpoint</th><th>Açıklama</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>GET</td><td><code>/durum</code></td><td>API çalışıyor mu</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3.2 Görev CRUD (zorunlu modül)</h3>
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Endpoint</th><th>Açıklama</th><th>Başarı kodu</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>GET</td><td><code>/gorevler</code></td><td>Tüm görevler</td><td>200</td></tr>
+        <tr><td>GET</td><td><code>/gorevler/:id</code></td><td>Tek görev</td><td>200 / 404</td></tr>
+        <tr><td>POST</td><td><code>/gorevler</code></td><td>Yeni görev</td><td>201</td></tr>
+        <tr><td>PUT</td><td><code>/gorevler/:id</code></td><td>Güncelle</td><td>200 / 404</td></tr>
+        <tr><td>DELETE</td><td><code>/gorevler/:id</code></td><td>Sil</td><td>200 / 404</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>POST / PUT gövde (örnek):</strong></p>
+    <pre>{
+  "baslik": "Postman test görevi",
+  "aciklama": "CRUD testi",
+  "oncelik": "orta",
+  "durum": "beklemede",
+  "atanan": "uye@taskflow.com"
+}</pre>
+
+    <h3>3.3 Temel middleware — Logger</h3>
+    <ul>
+      <li>Konsola yazar: method, URL, zaman</li>
+      <li>Dosyaya ekler: <code>gunluk/istekler.log</code></li>
+    </ul>
+    <p>Bu, eğitim yönergesindeki zorunlu <strong>tek temel middleware</strong> tasarımıdır.</p>
+
+    <h2>4. Proje envanteri (klasör / modül)</h2>
+    <table>
+      <thead>
+        <tr><th>Bileşen</th><th>Konum</th><th>Görevi</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Sunucu girişi</td><td><code>src/sunucu.js</code></td><td>Port, uygulama başlatma</td></tr>
+        <tr><td>Express uygulaması</td><td><code>src/uygulama.js</code></td><td>JSON, logger, rotalar</td></tr>
+        <tr><td>Rotalar</td><td><code>src/rotalar/</code></td><td>URL → denetleyici</td></tr>
+        <tr><td>Denetleyiciler</td><td><code>src/denetleyiciler/</code></td><td>İstek/cevap</td></tr>
+        <tr><td>Servisler</td><td><code>src/servisler/</code></td><td>JSON okuma/yazma</td></tr>
+        <tr><td>Middleware</td><td><code>src/araKatman/istekGunlugu.js</code></td><td>Logger</td></tr>
+        <tr><td>Veri</td><td><code>data/gorevler.json</code></td><td>Görev kayıtları</td></tr>
+        <tr><td>Bağımlılıklar</td><td><code>package.json</code></td><td>express, bcryptjs vb.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>5. Envanter özeti</h2>
+    <p>
+      Bu belge, <strong>proje envanteri</strong> kapsamında sunulan <strong>tasarım çıktısıdır</strong>: ihtiyaç analizi, veri modeli
+      ve API uçlarının planı ile kaynak kod klasör yapısının özeti. Uygulama kodu, Postman testleri ve bitirme teslimi bu PDF’ten
+      ayrı süreçlerde değerlendirilir.
+    </p>
+
+    <p class="footer">Belge sonu — TASKFLOW Tasarım Çıktısı</p>
+  </body>
+</html>

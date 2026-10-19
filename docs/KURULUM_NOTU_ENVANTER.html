@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <title>TASKFLOW — Kurulum Notu (README)</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Calibri, Arial, sans-serif;
+        font-size: 11pt;
+        line-height: 1.45;
+        color: #1a1a1a;
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 18mm 16mm;
+      }
+      h1 {
+        font-size: 18pt;
+        margin: 0 0 10pt;
+      }
+      h2 {
+        font-size: 13pt;
+        margin: 16pt 0 8pt;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 4pt;
+      }
+      .meta {
+        background: #f0f4f8;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 10pt 12pt;
+        margin-bottom: 14pt;
+      }
+      .meta p {
+        margin: 4pt 0;
+      }
+      a {
+        color: #0b57d0;
+        word-break: break-all;
+      }
+      pre,
+      code {
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 9.5pt;
+      }
+      pre {
+        background: #f6f8fa;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10pt;
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+        margin: 8pt 0;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 6pt 8pt;
+        text-align: left;
+      }
+      th {
+        background: #f0f4f8;
+      }
+      ul {
+        margin: 6pt 0 10pt;
+      }
+      @media print {
+        body {
+          padding: 12mm;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>TASKFLOW — Kurulum Notu (README)</h1>
+
+    <div class="meta">
+      <p><strong>Teslim:</strong> Backend Geliştirme Proje Envanteri — Kurulum Notu</p>
+      <p><strong>Öğrenci:</strong> Hatice Kübra Elma</p>
+      <p><strong>GitHub (public):</strong> <a href="https://github.com/Phobothikh/taskflow">https://github.com/Phobothikh/taskflow</a></p>
+      <p><strong>Canlı README:</strong> Depo kökündeki <code>README.md</code> ile aynı içeriğin özeti</p>
+    </div>
+
+    <h2>1. Proje nedir?</h2>
+    <p>
+      TASKFLOW, Node.js ve Express ile yazılmış bir <strong>REST API</strong> projesidir. Görev CRUD, istek günlüğü (logger middleware) ve
+      JSON dosya tabanlı veri saklama içerir. Tarayıcı paneli ve Postman koleksiyonu repoda mevcuttur.
+    </p>
+
+    <h2>2. Gereksinimler</h2>
+    <ul>
+      <li><strong>Node.js</strong> 18 veya üzeri</li>
+      <li><strong>npm</strong> (Node ile gelir)</li>
+      <li>İsteğe bağlı: Postman (API testi)</li>
+    </ul>
+
+    <h2>3. Projeyi indirme</h2>
+    <p><strong>Git ile klonlama (önerilen):</strong></p>
+    <pre>git clone https://github.com/Phobothikh/taskflow.git
+cd taskflow</pre>
+    <p><strong>Alternatif:</strong> GitHub → <em>Code</em> → <em>Download ZIP</em> → klasörü aç → terminalde <code>taskflow</code> dizinine gir.</p>
+
+    <h2>4. Bağımlılıkları kurma</h2>
+    <pre>npm install</pre>
+    <p>Bağımlılıklar <code>package.json</code> ve <code>package-lock.json</code> dosyalarından yüklenir (Express vb.).</p>
+
+    <h2>5. Sunucuyu çalıştırma</h2>
+    <p>Geliştirme (dosya değişince otomatik yeniden başlar):</p>
+    <pre>npm run dev</pre>
+    <p>Tek seferlik çalıştırma:</p>
+    <pre>npm start</pre>
+    <p>Varsayılan adres: <strong>http://localhost:3000</strong></p>
+    <p>Port doluysa (PowerShell):</p>
+    <pre>$env:PORT=3010; npm run dev</pre>
+
+    <h2>6. Kurulumun doğrulanması</h2>
+    <table>
+      <thead>
+        <tr><th>Kontrol</th><th>Adres</th><th>Beklenen</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>API ayakta mı?</td>
+          <td><code>GET http://localhost:3000/durum</code></td>
+          <td>JSON, <code>basarili: true</code></td>
+        </tr>
+        <tr>
+          <td>Görev listesi</td>
+          <td><code>GET http://localhost:3000/gorevler</code></td>
+          <td>JSON, <code>gorevler</code> dizisi</td>
+        </tr>
+        <tr>
+          <td>Panel</td>
+          <td>Tarayıcı → <code>/</code></td>
+          <td>TASKFLOW arayüzü</td>
+        </tr>
+        <tr>
+          <td>Logger</td>
+          <td><code>gunluk/istekler.log</code></td>
+          <td>Her istekte method + URL satırı</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>7. Postman</h2>
+    <p>Sunucu açıkken Postman → Import:</p>
+    <ul>
+      <li><code>postman/TASKFLOW.postman_collection.json</code></li>
+      <li><code>postman/TASKFLOW-Yerel.postman_environment.json</code></li>
+    </ul>
+    <p>Ortam: <strong>TASKFLOW Yerel</strong>. Adım adım: <code>docs/POSTMAN.md</code>. CRUD ekran görüntüleri: <code>docs/ekran-goruntuleri/</code>.</p>
+
+    <h2>8. Klasör yapısı (özet)</h2>
+    <pre>taskflow/
+  package.json          Bağımlılıklar ve npm scriptleri
+  README.md             Bu kurulum notunun tam metni (GitHub)
+  src/                  Sunucu, rotalar, servisler, logger
+  data/                 JSON veri dosyaları
+  postman/              Koleksiyon ve ortam
+  docs/                 Tanıtım, API, Postman rehberi
+  public/               Tarayıcı paneli</pre>
+
+    <h2>9. Sorun giderme</h2>
+    <ul>
+      <li><strong>Could not connect / bağlanamıyor:</strong> <code>npm run dev</code> çalışıyor mu?</li>
+      <li><strong>Port kullanımda:</strong> <code>PORT=3010</code> ile deneyin veya 3000’i kullanan uygulamayı kapatın.</li>
+      <li><strong>npm install hatası:</strong> Node sürümünü kontrol edin (18+).</li>
+    </ul>
+
+    <p style="margin-top: 20pt; text-align: center; font-size: 10pt"><strong>Belge sonu — TASKFLOW Kurulum Notu</strong></p>
+  </body>
+</html>
